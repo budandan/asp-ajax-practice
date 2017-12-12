@@ -1,24 +1,72 @@
-﻿<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>ASP.NET Web API is a framework that makes it easy to build HTTP services that reach
-        a broad range of clients, including browsers and mobile devices. ASP.NET Web API
-        is an ideal platform for building RESTful applications on the .NET Framework.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301870">Learn more &raquo;</a></p>
+﻿
+<div class="jumbotron">
+    <h1>Ajax Practice</h1>
+    <div class="row">
+        <br />
+        <p>Type in "Lowly Pawn" and "Middle Man" to get their supervisors</p>
+        <input type="text" id="realtime" placeholder="In real-time..."/>
+        <div id="outputRealtime"></div>
+        <br />
+        <br />
+        <p>Use a button to bring up a modal with an employees name while using a dropdown.</p>
+        @Html.DropDownList("StaffName", (List<SelectListItem>)ViewBag.dropdownList)
+        <a data-toggle="modal" href="#myModal" class="btn btn-primary" onclick="getSupervisorByID()">Get Supervisor</a>
     </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301871">Learn more &raquo;</a></p>
+
+    
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">The supervisor is...</h4>
+                </div>
+                <div class="modal-body" id="output">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301872">Learn more &raquo;</a></p>
-    </div>
-</div>
+
+
+@section Scripts {
+    <script type="text/javascript">
+        $("#realtime").on('input', function () {
+            var inputData = $("#realtime").val();
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetSupervisorForEmployeeByName", "Home")',
+                data: { 'name' : inputData },
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                    document.getElementById("outputRealtime").innerHTML = data.Name;
+                },
+                error: function () {
+                    document.getElementById("outputRealtime").innerHTML = "";
+                }
+            });
+        });
+
+        function getSupervisorByID() {
+            var selected = $("#StaffName").val();
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetSupervisorForEmployeeByID", "Home")',
+                data: { 'id' : selected },
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                    document.getElementById("output").innerHTML = data.Name;
+                },
+                error: function () {
+                    alert("something went wrong");
+                }
+            });
+        }
+    </script>
+}
